@@ -1,0 +1,12 @@
+{
+	"name": "myrtle-parser",
+	"version": "0.1.0",
+	"description": "A parser for a simple declarative DSL syntax.",
+	"main": "parser",
+	"author": "Liam Doherty",
+	"dependencies" : { 
+	},
+	"engines": {
+		 "node" : "0.4"
+	}
+}
