@@ -15,9 +15,10 @@ function removeMultilineComments(lines){
 			if(ei !== -1){
 				inComment = false;
 				lines[j] = line.substr(ei+2);
-				--j;
-				continue;
+			}else{
+				lines.splice(j, 1);
 			}
+			--j;
 		}else{
 			var i = line.indexOf('/*');
 			if(i !== -1){
@@ -25,7 +26,6 @@ function removeMultilineComments(lines){
 				if(ei !== -1){
 					lines[j] = line.substr(0, i) + line.substr(ei+2);
 					--j;
-					continue;
 				}else{
 					lines[j] = line.substr(0, i);
 					inComment = true;
@@ -43,8 +43,39 @@ function countIndents(line){
 	return k;
 }
 
+function splitOnSpaces(str){
+	var r = [];
+	var cur = '';
+	var rb = 0;
+	var sb = 0;
+	var cb = 0;
+	for(var i=0;i<str.length;++i){
+		var c = str.charAt(i);
+		if(c === '[') ++sb;
+		else if(c === ']') --sb;
+		else if(c === '(') ++sb;
+		else if(c === ')') --sb;
+		else if(c === '{') ++sb;
+		else if(c === '}') --sb;
+
+		if(c === ' ' && rb === 0 && sb === 0 && cb === 0){
+			if(cur.length > 0){
+				r.push(cur);
+				cur = '';
+			}
+		}else{
+			cur += c;			
+		}
+	}
+	if(cur.length > 0) r.push(cur);
+	//console.log('[' + str + ']');
+	//console.log(r);
+	return r;
+}
+
 function parseTokens(line){
-	var tempTokens = line.split(' ');
+	var tempTokens = splitOnSpaces(line);//line.split(' ');
+	//console.log(tempTokens);
 	var tokens = [];
 	for(var k=0;k<tempTokens.length;++k){
 		var token = tempTokens[k];
@@ -54,6 +85,8 @@ function parseTokens(line){
 	return tokens;
 }
 
+//var sys = require('sys');
+
 exports.parse = function(str){
 
 	if(typeof(str) !== 'string'){
@@ -62,7 +95,9 @@ exports.parse = function(str){
 
 	var lines = str.split('\n');
 	
+	//console.log(lines);
 	removeMultilineComments(lines);
+	///sys.debug(lines);
 
 	var stack = [{tokens: [], children: []}];
 	var depth = 0;
