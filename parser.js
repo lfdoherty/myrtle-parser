@@ -57,6 +57,8 @@ function splitOnSpaces(str){
 		else if(c === ')') --sb;
 		else if(c === '{') ++sb;
 		else if(c === '}') --sb;
+		else if(c === '<') ++sb;
+		else if(c === '>') --sb;
 
 		if(c === ' ' && rb === 0 && sb === 0 && cb === 0){
 			if(cur.length > 0){
@@ -90,7 +92,7 @@ function parseTokens(line){
 exports.parse = function(str){
 
 	if(typeof(str) !== 'string'){
-		throw 'parse str is not of type string';
+		throw new Error('parse str is not of type string');
 	}
 
 	var lines = str.split('\n');
