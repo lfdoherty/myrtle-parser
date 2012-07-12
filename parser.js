@@ -1,8 +1,13 @@
 
 function removeLineComments(line){
 	var pos = line.indexOf('//');
-	if(pos !== -1) return line.substring(0, pos);
-	else return line;
+	if(pos !== -1){
+		//console.log('removing line comments: ' + line)
+		return line.substring(0, pos);
+	}else{
+		//console.log('no comments: ' + line)
+		return line;
+	}
 }
 
 function removeMultilineComments(lines){
@@ -43,7 +48,7 @@ function countIndents(line){
 	return k;
 }
 
-function splitOnSpaces(str){
+function splitOn(str, delim){
 	var r = [];
 	var cur = '';
 	var rb = 0;
@@ -60,7 +65,7 @@ function splitOnSpaces(str){
 		else if(c === '<') ++sb;
 		else if(c === '>') --sb;
 
-		if(c === ' ' && rb === 0 && sb === 0 && cb === 0){
+		if(c === delim && rb === 0 && sb === 0 && cb === 0){
 			if(cur.length > 0){
 				r.push(cur);
 				cur = '';
@@ -76,7 +81,7 @@ function splitOnSpaces(str){
 }
 
 function parseTokens(line){
-	var tempTokens = splitOnSpaces(line);//line.split(' ');
+	var tempTokens = splitOn(line, ' ');//line.split(' ');
 	//console.log(tempTokens);
 	var tokens = [];
 	for(var k=0;k<tempTokens.length;++k){
@@ -95,17 +100,26 @@ exports.parse = function(str){
 		throw new Error('parse str is not of type string');
 	}
 
-	var lines = str.split('\n');
+	var actualLines = str.split('\n');
+	for(var i=0;i<actualLines.length;++i){
+		actualLines[i] = removeLineComments(actualLines[i]);
+	}
+	removeMultilineComments(actualLines);
+	var reStr = ''
+	for(var i=0;i<actualLines.length;++i){
+		reStr += actualLines[i]+'\n'
+	}
+	var lines = splitOn(reStr, '\n')//str.split('\n');
 	
 	//console.log(lines);
-	removeMultilineComments(lines);
+	//removeMultilineComments(lines);
 	///sys.debug(lines);
 
 	var stack = [{tokens: [], children: []}];
 	var depth = 0;
 	for(var i=0;i<lines.length;++i){
 	
-		var line = removeLineComments(lines[i]);
+		var line = lines[i]//removeLineComments(lines[i]);
 		
 		if(line.trim().length === 0) continue;
 		
