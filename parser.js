@@ -135,6 +135,7 @@ exports.parse = function(str){
 		}
 			
 		var node = {tokens: parseTokens(line), children: []};
+		node.string = line
 		stack[stack.length-1].children.push(node);
 		stack.push(node);
 		depth = indent + 1;
